@@ -31,6 +31,7 @@ $ hcpxread
     -debug
       	Show additional, debugging info
 ```
+**Note**: debugging will disable clearing the screen after an action.
 
 ## Example
 ```
@@ -43,17 +44,18 @@ INFO[0000] Summary: 17 networks, 0 WPA/17 WPA2, 16 unique APs
 1.  [WPA2] XXX                B0:48:7A:BF:07:A4
 2.  [WPA2] XXXXX              08:10:77:5B:AC:ED
 ...
-17. [WPA2] XXXXXX             64:70:02:9E:4D:1A
+17. [WPA2] XXXXXXXXXX         64:70:02:9E:4D:1A
 0.  Exit
 
 network > 1
 
-Message Pair                  |ESSID Length
-0 - replay counter matching   |3
+Key Version |ESSID |ESSID length |BSSID             |Client MAC
+WPA2        |XXX   |3            |B0:48:7A:BF:07:A4 |88:9F:FA:89:10:2E
 
-Key Version   |ESSID   |BSSID               |Client MAC
-WPA2          |XXX     |B0:48:7A:BF:07:A4   |88:9F:FA:89:10:2E
+Handshake messages |EAPOL Source |AP message |STA message |Replay counter match
+M1 + M2            |M2           |M1         |M2          |true
 
+...
 ```
 
 ## To do
