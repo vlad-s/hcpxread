@@ -57,6 +57,8 @@ func (key WPAKey) String() string {
 }
 
 type HccapxInstance struct {
+	Content []byte
+
 	Signature   []byte      // the signature (file magic) of .hccapx files, it is always the string HCPX
 	Version     Version     // the version number of the .hccapx file format
 	MessagePair MessagePair // possible values range from 0 to 5 or 128 to 133

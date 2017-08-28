@@ -11,6 +11,7 @@ import (
 func PrintCommands() {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.TabIndent)
 	fmt.Println()
+	fmt.Fprintln(w, "99.\tExport")
 	fmt.Fprintln(w, "0.\tExit")
 	w.Flush()
 }

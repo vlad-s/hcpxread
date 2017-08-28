@@ -102,9 +102,14 @@ func main() {
 			continue
 		}
 
-		if err := menu.ParseChoice(choice, Instances); err != nil {
+		exported, err := menu.ParseChoice(choice, Instances)
+		if err != nil {
 			helpers.ClearScreen()
 			log.Error(err)
+		}
+		if exported {
+			helpers.ClearScreen()
+			log.Info("File successfully exported")
 		}
 	}
 }

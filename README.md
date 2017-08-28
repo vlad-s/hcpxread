@@ -60,7 +60,7 @@ M1 + M2            |M2           |M1         |M2          |true
 ```
 
 ## To do
-* Export individual or a range of APs to an external HCCAPX file
+* Export ~~individual or~~ a range of APs to an external HCCAPX file
 * Export individual or a range of APs to JSON
 * ~~Add more data in the output~~
 * ~~Add the message pair table~~

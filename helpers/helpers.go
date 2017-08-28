@@ -53,6 +53,7 @@ func ParseHccapx(b []byte) (h structs.HccapxInstance) {
 	essid := bytes.Replace(b[10:42], []byte{0}, []byte{}, -1)
 
 	h = structs.HccapxInstance{
+		Content:     b,
 		Signature:   b[0:4],
 		Version:     b[4:8],
 		MessagePair: structs.MessagePair(b[8:9][0]),
