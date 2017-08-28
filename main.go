@@ -85,16 +85,18 @@ type HccapxInstance struct {
 }
 
 func (h HccapxInstance) Print() {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', tabwriter.Debug)
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 
-	fmt.Println()
-	fmt.Fprintln(w, "Message Pair\tESSID Length")
-	fmt.Fprintf(w, "%d - %s\t%d\n", h.MessagePair, h.MessagePair.Meaning(), h.ESSIDLength)
+	clearScreen(true)
+	fmt.Fprintln(w, "Key Version\tESSID\tESSID length\tBSSID\tClient MAC")
+	fmt.Fprintf(w, "%s\t%s\t%d\t%s\t%s\n", h.KeyVersion, h.ESSID, h.ESSIDLength, h.StationMAC, h.ClientMAC)
 	w.Flush()
 
 	fmt.Println()
-	fmt.Fprintln(w, "Key Version\tESSID\tBSSID\tClient MAC")
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", h.KeyVersion, h.ESSID, h.StationMAC, h.ClientMAC)
+	fmt.Fprintln(w, "Handshake messages\tEAPOL Source\tAP message\tSTA message\tReplay counter match")
+	mp := MessagePairTable[h.MessagePair]
+	fmt.Fprintf(w, "M%d + M%d\tM%d\tM%d\tM%d\t%v\n", mp.APMessage, mp.ClientMessage, mp.EAPOLSource,
+		mp.APMessage, mp.ClientMessage, mp.ReplayCounterMatching)
 	w.Flush()
 }
 
@@ -136,9 +138,27 @@ func (h HccapxInstances) UniqueAPs() int {
 	return len(aps)
 }
 
-var log = logrus.New()
-var hcpxHeader = []byte{72, 67, 80, 88}
-var Instances HccapxInstances
+type MessagePairStructure struct {
+	EAPOLSource           uint8
+	APMessage             uint8
+	ClientMessage         uint8
+	ReplayCounterMatching bool
+}
+
+var MessagePairTable = map[MessagePair]MessagePairStructure{
+	0:   {2, 1, 2, true},
+	1:   {4, 1, 4, true},
+	2:   {2, 3, 2, true},
+	3:   {3, 3, 2, true},
+	4:   {3, 3, 4, true},
+	5:   {4, 3, 4, true},
+	128: {2, 1, 2, false},
+	129: {4, 1, 4, false},
+	130: {2, 3, 2, false},
+	131: {3, 3, 2, false},
+	132: {3, 3, 4, false},
+	133: {4, 3, 4, false},
+}
 
 var (
 	capture = flag.String("capture", "", "The HCCAPX `file` to read")
@@ -153,6 +173,12 @@ const BANNER = ` _                                       _
            |_|
 `
 
+var (
+	log        = logrus.New()
+	hcpxHeader = []byte{72, 67, 80, 88}
+	Instances  HccapxInstances
+)
+
 func init() {
 	flag.Parse()
 	log.SetLevel(logrus.DebugLevel)
@@ -165,6 +191,7 @@ func init() {
 }
 
 func main() {
+	clearScreen()
 	stat, err := os.Stat(*capture)
 	if err != nil {
 		log.WithError(err).Fatal("Error stating the file")
@@ -194,7 +221,7 @@ func main() {
 	log.WithField("indexes", len(indexes)).Info("Finished searching for headers")
 
 	for _, v := range indexes {
-		h := ParseHccapx(content[v : v+393])
+		h := ParseHccapx(content[v:v+393])
 		Instances = append(Instances, h)
 	}
 
@@ -265,4 +292,12 @@ func ParseHccapx(b []byte) (h HccapxInstance) {
 	h.EAPOLLength = uint16(EAPOLLength)
 
 	return
+}
+
+func clearScreen(nl ...bool) {
+	c := "\033[H\033[2J"
+	if len(nl) == 1 && nl[0] {
+		c += "\n"
+	}
+	fmt.Print(c)
 }
