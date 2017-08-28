@@ -2,11 +2,8 @@ package structs
 
 import (
 	"encoding/hex"
-	"fmt"
-	"os"
 	"strconv"
 	"strings"
-	"text/tabwriter"
 )
 
 var HcpxHeader = []byte{72, 67, 80, 88}
@@ -79,32 +76,7 @@ type HccapxInstance struct {
 	EAPOL       []byte // the EAPOL (max 256 bytes)
 }
 
-func (h HccapxInstance) Print() {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
-
-	fmt.Fprintln(w, "Key Version\tESSID\tESSID length\tBSSID\tClient MAC")
-	fmt.Fprintf(w, "%s\t%s\t%d\t%s\t%s\n", h.KeyVersion, h.ESSID, h.ESSIDLength, h.StationMAC, h.ClientMAC)
-	w.Flush()
-
-	fmt.Println()
-	fmt.Fprintln(w, "Handshake messages\tEAPOL Source\tAP message\tSTA message\tReplay counter match")
-	mp := MessagePairTable[h.MessagePair]
-	fmt.Fprintf(w, "M%d + M%d\tM%d\tM%d\tM%d\t%v\n", mp.APMessage, mp.ClientMessage, mp.EAPOLSource,
-		mp.APMessage, mp.ClientMessage, mp.ReplayCounterMatching)
-	w.Flush()
-}
-
 type HccapxInstances []HccapxInstance
-
-func (h HccapxInstances) Print() {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.TabIndent)
-	fmt.Println()
-	for k, v := range h {
-		fmt.Fprintf(w, "%d.\t[%s]\t%s\t%s\n", k+1, v.KeyVersion, v.ESSID, v.StationMAC)
-	}
-	fmt.Fprintln(w, "0.\tExit")
-	w.Flush()
-}
 
 func (h HccapxInstances) WPANum() (c int) {
 	for _, v := range h {
@@ -132,11 +104,20 @@ func (h HccapxInstances) UniqueAPs() int {
 	return len(aps)
 }
 
+type ReplayCounter bool
+
+func (r ReplayCounter) String() string {
+	if r {
+		return "yes"
+	}
+	return "no"
+}
+
 type MessagePairStructure struct {
 	EAPOLSource           uint8
 	APMessage             uint8
 	ClientMessage         uint8
-	ReplayCounterMatching bool
+	ReplayCounterMatching ReplayCounter
 }
 
 var MessagePairTable = map[MessagePair]MessagePairStructure{

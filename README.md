@@ -5,6 +5,7 @@ You can learn more about the HCCAPX format [from the official docs](https://hash
 
 Long story short,
 >hccapx is a custom format, specifically developed for hashcat.
+>The hccapx is an improved version of the old hccap format, both were specifically designed and used for hash type -m 2500 = WPA/WPA2.
 
 `hcpxread` was designed based on the official HCCAPX specifications:
 ![HCCAPX specifications](https://hashcat.net/wiki/lib/exe/fetch.php?cache=&media=hccapx_specs.jpg)
@@ -59,7 +60,8 @@ M1 + M2            |M2           |M1         |M2          |true
 ```
 
 ## To do
-* Export individual or a range of APs to an external file
-* Add more data in the output
+* Export individual or a range of APs to an external HCCAPX file
+* Export individual or a range of APs to JSON
+* ~~Add more data in the output~~
 * ~~Add the message pair table~~
-* Debugging flag should make the output more verbose
+* ~~Debugging flag should make the output more verbose~~ _how much more?_

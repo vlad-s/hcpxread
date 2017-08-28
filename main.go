@@ -8,8 +8,10 @@ import (
 	"os"
 
 	"github.com/c2h5oh/datasize"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/vlad-s/hcpxread/helpers"
+	"github.com/vlad-s/hcpxread/menu"
 	"github.com/vlad-s/hcpxread/structs"
 )
 
@@ -41,15 +43,11 @@ func init() {
 		os.Exit(1)
 	}
 
-	fmt.Println("debug pre-set", helpers.Debug())
 	helpers.SetDebugging(*debug)
-	fmt.Println("debug post-set", helpers.Debug())
 }
 
 func main() {
-	if !helpers.Debug() {
-		helpers.ClearScreen()
-	}
+	helpers.ClearScreen()
 
 	stat, err := os.Stat(*capture)
 	if err != nil {
@@ -93,34 +91,20 @@ func main() {
 
 	var choice int
 	for {
-		Instances.Print()
-		fmt.Printf("\nnetwork > ")
+		helpers.PrintInstances(Instances)
+		helpers.PrintCommands()
 
+		fmt.Printf("\nchoice > ")
 		_, err := fmt.Fscanf(os.Stdin, "%d", &choice)
 		if err != nil {
-			if !helpers.Debug() {
-				helpers.ClearScreen()
-			}
+			helpers.ClearScreen()
+			log.Error(errors.Wrap(err, "Error scanning input"))
+			continue
+		}
+
+		if err := menu.ParseChoice(choice, Instances); err != nil {
+			helpers.ClearScreen()
 			log.Error(err)
-			continue
 		}
-
-		if choice <= 0 {
-			log.Info("Exiting, goodbye")
-			os.Exit(0)
-		}
-
-		if choice > len(Instances) {
-			if !helpers.Debug() {
-				helpers.ClearScreen()
-			}
-			log.Warn("Invalid index")
-			continue
-		}
-
-		if !helpers.Debug() {
-			helpers.ClearScreen(true)
-		}
-		Instances[choice-1].Print()
 	}
 }

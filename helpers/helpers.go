@@ -31,7 +31,9 @@ func ClearScreen(nl ...bool) {
 	if len(nl) == 1 && nl[0] {
 		c += "\n"
 	}
-	fmt.Print(c)
+	if !Debug() {
+		fmt.Print(c)
+	}
 }
 
 func SearchHeaders(content []byte) (pos []int) {
