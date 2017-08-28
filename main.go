@@ -203,6 +203,9 @@ func main() {
 	}
 
 	if len(content) < 393 {
+		if *debug {
+			log.WithField("size", len(content)).Debug("File too small")
+		}
 		log.WithField("bytes", len(content)).Fatal("File too small for a single HCPX structure")
 	}
 
@@ -220,8 +223,9 @@ func main() {
 	indexes := SearchHeaders(content)
 	log.WithField("indexes", len(indexes)).Info("Finished searching for headers")
 
-	for _, v := range indexes {
-		h := ParseHccapx(content[v:v+393])
+	for _, i := range indexes {
+		j := i + 393
+		h := ParseHccapx(content[i:j])
 		Instances = append(Instances, h)
 	}
 

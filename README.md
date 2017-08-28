@@ -59,5 +59,5 @@ WPA2          |XXX     |B0:48:7A:BF:07:A4   |88:9F:FA:89:10:2E
 ## To do
 * Export individual or a range of APs to an external file
 * Add more data in the output
-* Add the message pair table
+* ~~Add the message pair table~~
 * Debugging flag should make the output more verbose
