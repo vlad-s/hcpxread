@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/c2h5oh/datasize"
 	"github.com/pkg/errors"
@@ -90,18 +93,27 @@ func main() {
 		len(Instances), Instances.WPANum(), Instances.WPA2Num(), Instances.UniqueAPs())
 
 	var choice int
+	reader := bufio.NewReader(os.Stdin)
 	for {
 		helpers.PrintInstances(Instances)
 		helpers.PrintCommands()
 
 		fmt.Printf("\nchoice > ")
-		_, err := fmt.Fscanf(os.Stdin, "%d", &choice)
+		usertext, err := reader.ReadString('\n')
 		if err != nil {
 			helpers.ClearScreen()
-			log.Error(errors.Wrap(err, "Error scanning input"))
+			log.Error(errors.Wrap(err, "Error input"))
 			continue
 		}
+		usertext = strings.Replace(usertext, "\n", "", -1)
+		usertext = strings.Replace(usertext, "\r", "", -1)
 
+		choice, err = strconv.Atoi(usertext)
+		if err != nil {
+			helpers.ClearScreen()
+			log.Error(errors.Wrap(err, "Error converting to number"))
+			continue
+		}
 		exported, err := menu.ParseChoice(choice, Instances)
 		if err != nil {
 			helpers.ClearScreen()
